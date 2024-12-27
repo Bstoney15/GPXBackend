@@ -4,12 +4,11 @@ import(
 	"fmt"
 	"net/http"
 	"os"
+	"GPXBackend/handlers"
 	"github.com/joho/godotenv"
 )
 
-func test(w http.ResponseWriter, r *http.Request){
-	fmt.Println(w, " :test")
-}
+
 
 
 func main(){
@@ -29,7 +28,7 @@ func main(){
 
 
 
-	mux.HandleFunc("/test", test)
+	mux.HandleFunc("/test", handlers.Test)
 
 
 	server := &http.Server{
