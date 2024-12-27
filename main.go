@@ -3,6 +3,8 @@ package main
 import(
 	"fmt"
 	"net/http"
+	"os"
+	"github.com/joho/godotenv"
 )
 
 func test(w http.ResponseWriter, r *http.Request){
@@ -12,7 +14,20 @@ func test(w http.ResponseWriter, r *http.Request){
 
 func main(){
 
+
 	mux := http.NewServeMux()
+	if mux == nil {
+		fmt.Println("Error creating mux")
+		return
+	}
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
+	}
+
+
 
 	mux.HandleFunc("/test", test)
 
@@ -23,6 +38,4 @@ func main(){
 	}
 
 	server.ListenAndServe()
-
-	fmt.Print("test\n")
 }
