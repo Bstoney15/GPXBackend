@@ -26,9 +26,9 @@ func main(){
 		return
 	}
 
-	fmt.Println("Loaded .env file")
+	fmt.Print("Loaded .env file\n\n")
 	dbhandler.Init()
-	fmt.Print("Initialized database connection")
+	fmt.Print("Initialized database connection\n\n")
 
 
 
