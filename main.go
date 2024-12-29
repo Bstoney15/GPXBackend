@@ -3,8 +3,8 @@ package main
 import(
 	"fmt"
 	"net/http"
-	"os"
 	"GPXBackend/handlers"
+	"GPXBackend/dbhandler"
 	"github.com/joho/godotenv"
 )
 
@@ -26,6 +26,10 @@ func main(){
 		return
 	}
 
+	fmt.Println("Loaded .env file")
+	dbhandler.Init()
+	fmt.Print("Initialized database connection")
+
 
 
 	mux.HandleFunc("/test", handlers.Test)
@@ -36,5 +40,7 @@ func main(){
 		Handler: mux,
 	}
 
+
+	fmt.Println("Server running on port 8080")
 	server.ListenAndServe()
 }
