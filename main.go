@@ -1,10 +1,11 @@
 package main
 
-import(
+import (
+	"GPXBackend/dbhandler"
+	"GPXBackend/handlers"
+	"context"
 	"fmt"
 	"net/http"
-	"GPXBackend/handlers"
-	"GPXBackend/dbhandler"
 	"github.com/joho/godotenv"
 )
 
@@ -12,7 +13,6 @@ import(
 
 
 func main(){
-
 
 	mux := http.NewServeMux()
 	if mux == nil {
@@ -27,20 +27,18 @@ func main(){
 	}
 
 	fmt.Print("Loaded .env file\n\n")
-	dbhandler.Init()
+	dbhandler.Init() // Initialize database connection
 	fmt.Print("Initialized database connection\n\n")
 
-
-
 	mux.HandleFunc("/test", handlers.Test)
-
+	mux.HandleFunc("/Add_User", handlers.AddUser)
 
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: mux,
 	}
 
-
+	defer dbhandler.RemoteDB.Close(context.Background()) // Close database connection when server is closed
 	fmt.Println("Server running on port 8080")
-	server.ListenAndServe()
-}
+	server.ListenAndServe() // Start server
+} 
