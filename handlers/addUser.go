@@ -6,7 +6,7 @@ import (
     "fmt"
     "net/http"
     "GPXBackend/dbhandler"
-    "regexp"
+    "GPXBackend/datavalidators"
 )
 
 type user struct {
@@ -17,26 +17,7 @@ type user struct {
     Last_name     string `json:"last_name"`
 }
 
-func isValidEmail(email string) bool {
-	// Simple regex for validating email format
-	regex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	re := regexp.MustCompile(regex)
-	return re.MatchString(email)
-}
 
-func isValidUsername(password string) bool {
-    // Check for potential SQL injection patterns
-    regex := `^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$`
-    re := regexp.MustCompile(regex)
-    return re.MatchString(password) && len(password) >= 8
-}
-
-func isValidName(name string) bool {
-    // Check for potential SQL injection patterns
-    regex := `^[a-zA-Z]*$`
-    re := regexp.MustCompile(regex)
-    return re.MatchString(name)
-}
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
     var u user
@@ -46,17 +27,17 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if !isValidEmail(u.Email) {
+    if !datavalidators.IsValidEmail(u.Email) {
         http.Error(w, "Invalid email", 462)
         return
     }
 
-    if !isValidUsername(u.Username) {
+    if !datavalidators.IsValidUsername(u.Username) {
         http.Error(w, "Invalid username", 463)
         return
     }
     
-    if !isValidName(u.First_name) || !isValidName(u.Last_name) {
+    if !datavalidators.IsValidName(u.First_name) || !datavalidators.IsValidName(u.Last_name) {
         http.Error(w, "Invalid name", 464)
         return
     }
