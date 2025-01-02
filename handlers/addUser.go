@@ -24,6 +24,20 @@ func isValidEmail(email string) bool {
 	return re.MatchString(email)
 }
 
+func isValidUsername(password string) bool {
+    // Check for potential SQL injection patterns
+    regex := `^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$`
+    re := regexp.MustCompile(regex)
+    return re.MatchString(password) && len(password) >= 8
+}
+
+func isValidName(name string) bool {
+    // Check for potential SQL injection patterns
+    regex := `^[a-zA-Z]*$`
+    re := regexp.MustCompile(regex)
+    return re.MatchString(name)
+}
+
 func AddUser(w http.ResponseWriter, r *http.Request) {
     var u user
     err := json.NewDecoder(r.Body).Decode(&u)
@@ -37,6 +51,15 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    if !isValidUsername(u.Username) {
+        http.Error(w, "Invalid username", 463)
+        return
+    }
+    
+    if !isValidName(u.First_name) || !isValidName(u.Last_name) {
+        http.Error(w, "Invalid name", 464)
+        return
+    }
 
     _, err2 := dbhandler.RemoteDB.Exec(context.Background(), "INSERT INTO users (username, email, password_hash, first_name, last_name) VALUES ($1, $2, $3, $4, $5)", u.Username, u.Email, u.Password_hash, u.First_name, u.Last_name)
     if err2 != nil {
