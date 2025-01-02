@@ -6,7 +6,7 @@ import (
     "fmt"
     "net/http"
     "GPXBackend/dbhandler"
-    "regexp"
+    "GPXBackend/datavalidators"
 )
 
 type user struct {
@@ -17,12 +17,7 @@ type user struct {
     Last_name     string `json:"last_name"`
 }
 
-func isValidEmail(email string) bool {
-	// Simple regex for validating email format
-	regex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	re := regexp.MustCompile(regex)
-	return re.MatchString(email)
-}
+
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
     var u user
@@ -32,11 +27,20 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if !isValidEmail(u.Email) {
+    if !datavalidators.IsValidEmail(u.Email) {
         http.Error(w, "Invalid email", 462)
         return
     }
 
+    if !datavalidators.IsValidUsername(u.Username) {
+        http.Error(w, "Invalid username", 463)
+        return
+    }
+    
+    if !datavalidators.IsValidName(u.First_name) || !datavalidators.IsValidName(u.Last_name) {
+        http.Error(w, "Invalid name", 464)
+        return
+    }
 
     _, err2 := dbhandler.RemoteDB.Exec(context.Background(), "INSERT INTO users (username, email, password_hash, first_name, last_name) VALUES ($1, $2, $3, $4, $5)", u.Username, u.Email, u.Password_hash, u.First_name, u.Last_name)
     if err2 != nil {
